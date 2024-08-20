@@ -9,12 +9,13 @@ on:
     branches:
       - main
       - release-*
+      - main-stk-ci
   pull_request: {}
   workflow_dispatch: {}
 
 jobs:
   ci:
-    uses: upbound/official-providers-ci/.github/workflows/provider-ci.yml@standard-runners
+    uses: stakater/crossplane-providers-ci/.github/workflows/provider-ci.yml@main
     with:
       go-version: 1.21
     secrets:
