@@ -115,6 +115,14 @@ var terraformPluginSDKExternalNameConfigs = map[string]config.ExternalName{
 	//
 	// azuread_service_principal_delegated_permission_grant can be imported using their ID
 	"azuread_service_principal_delegated_permission_grant": config.IdentifierFromProvider,
+
+	// privileged
+	//
+	// azuread_privileged_access_group_assignment_schedule can be imported using their ID
+	"azuread_privileged_access_group_assignment_schedule": config.IdentifierFromProvider,
+
+	// azuread_privileged_access_group_eligibility_schedule can be imported using their ID
+	"azuread_privileged_access_group_eligibility_schedule": config.IdentifierFromProvider,
 }
 
 // cliReconciledExternalNameConfigs contains all external name configurations
