@@ -100,15 +100,27 @@ func main() { //nolint:gocyclo // easier to follow as a unit
 
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	log.Default().SetOutput(io.Discard)
-	ctrl.SetLogger(zap.New(zap.WriteTo(io.Discard)))
 
 	zl := zap.New(zap.UseDevMode(*debug))
 	logr := logging.NewLogrLogger(zl.WithName("provider-azuread"))
+	// The controller-runtime runs with a no-op logger by default. It is
+	// *very* verbose even at info level, so we only provide it a real
+	// logger when we're running in debug mode.
+	//
+	// ctrl.SetLogger MUST be called exactly once. It fulfils a one-shot
+	// promise: loggerPromise.Fulfill sets `p.logger.promise = nil`, and
+	// delegatingLogSink.Fulfill is guarded by `if l.promise != nil`, so
+	// every call after the first is silently a no-op. Unconditionally
+	// installing the io.Discard logger here and then calling SetLogger(zl)
+	// under *debug -- as this file did -- meant the debug logger NEVER
+	// reached controller-runtime, and `--debug` produced no "Starting
+	// Controller"/"Starting EventSource"/"Starting workers" lines at all.
+	// That hid per-informer startup timing exactly when it was needed to
+	// debug a cache-sync timeout.
 	if *debug {
-		// The controller-runtime runs with a no-op logger by default. It is
-		// *very* verbose even at info level, so we only provide it a real
-		// logger when we're running in debug mode.
 		ctrl.SetLogger(zl)
+	} else {
+		ctrl.SetLogger(zap.New(zap.WriteTo(io.Discard)))
 	}
 
 	// currently, we configure the jitter to be the 5% of the poll interval
